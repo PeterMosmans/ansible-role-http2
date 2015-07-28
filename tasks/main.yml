@@ -1,0 +1,112 @@
+---
+# tasks file for http2
+- name: Install necessary packages
+  apt:
+    name={{ item }}
+    update_cache=yes
+    cache_valid_time=86400
+    install-recommends=no
+    state=present
+  with_items:
+    - autoconf
+    - automake
+    - g++
+    - libtool
+    - libev-dev
+    - libevent-dev
+    - libxml2-dev
+    - make
+    - pkg-config
+    - zlib1g-dev
+
+- name: Add git group
+  group: name=git state=present
+
+- name: Create git location
+  file:
+    path=/var/git
+    owner=root
+    group=git
+    mode=g+rwxs
+    recurse=yes
+    state=directory
+
+- name: Clone necessary repositories
+  git:
+    repo={{ item.src }}
+    dest={{ item.dest }}
+    depth=1
+    accept_hostkey=yes
+    force=yes
+  with_items:
+    - src: https://github.com/PeterMosmans/openssl
+      dest: /var/git/openssl
+    - src: https://github.com/tatsuhiro-t/spdylay
+      dest: /var/git/spdylay
+    - src: https://github.com/tatsuhiro-t/nghttp2
+      dest: /var/git/nghttp2
+    - src: https://github.com/bagder/curl
+      dest: /var/git/curl
+
+#- name: Fix permissions on git repositories
+# todo: check if correct version of OpenSSL is installed. If so, skip the next steps
+# pkg-config --modversion libssl >= 1.0.2
+
+- name: Patch OpenSSL
+  shell: cd /var/git/openssl && patch -Nsp1 -i /var/git/openssl/patches/openssl.ld.patch
+  ignore_errors: yes
+
+- name: Clean OpenSSL artefacts
+  shell: cd /var/git/openssl && make clean; make dclean;
+  ignore_errors: yes
+
+- name: Configure OpenSSL
+  shell: cd /var/git/openssl && ./Configure linux-x86_64 zlib shared --prefix=/usr/local --openssldir=/etc/ssl --libdir=lib
+
+- name: Build, test and install OpenSSL
+  shell: cd /var/git/openssl && make depend 1>/dev/null && make 1>/dev/null && make test && make install_sw
+
+- name: Install OpenSSL
+  shell: cd /var/git/openssl && make install_sw
+
+- name: Update cache
+  command: ldconfig -v
+
+# todo: check if correct version of spdy library is installed. If so, skip the next steps
+# pkg-config --modversion libspdylay >= 1.3.3-DEV
+- name: Build and install spdy library
+  shell: cd /var/git/spdylay && autoreconf -i && automake && autoconf && ./configure && make && make install
+
+- name: Update cache
+  command: ldconfig -v
+  
+- name: Build and install nghttp library
+  shell: cd /var/git/nghttp2 && autoreconf -i && automake && autoconf && ./configure && make && make install
+
+- name: Update cache
+  command: ldconfig -v
+
+- name: Build and install curl
+  shell: cd /var/git/curl && autoreconf -i && automake && autoconf && ./configure --with-nghttp2 && make && make install
+
+- name: Update cache
+  command: ldconfig -v
+  
+#- name: Remove necessary packages
+#  apt:
+#    name={{ item }}
+#    update_cache=yes
+#    cache_valid_time=86400
+#    install-recommends=no
+#    state=absent
+#  with_items:
+#    - autoconf
+#    - automake
+#    - g++
+#    - libtool
+#    - libev-dev
+#    - libevent-dev
+#    - libxml2-dev
+#    - make
+#    - pkg-config
+#    - zlib1g-dev
