@@ -33,7 +33,8 @@
   shell: g++ --version
   register: gpp_version
 
-- debug: var=gpp_version  
+# TODO: check whether compiler is up-to-date-enough (>= 4.9
+# - debug: var=gpp_version  
 
 - name: Create git location
   file:
@@ -106,8 +107,8 @@
 - name: Update cache
   command: ldconfig -v
 
-- name: Build curl
-  shell: cd /var/git/curl && autoreconf -i && automake && autoconf && ./configure --with-nghttp2
+- name: Configure and build curl
+  shell: cd /var/git/curl && autoreconf -i && automake && autoconf && ./configure --with-nghttp2 && make
 
 - name: Test and install curl tools and library (takes quite a while...)
   shell: cd /var/git/curl && make test && make install

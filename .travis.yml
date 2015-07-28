@@ -16,8 +16,6 @@ env:
   - SITE=test.yml
 
 before_install:
-#  - sudo apt-get remove -y gcc
-#  - sudo apt-get remove -y g++
   - sudo apt-get update -qq 1>/dev/null
   - sudo apt-get install -qq libstdc++-4.9-dev
   - sudo apt-get install -qq gcc-4.9 g++-4.9
@@ -25,12 +23,9 @@ before_install:
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
   - sudo update-alternatives --config gcc
   - sudo update-alternatives --config g++
-#  - export CXX="g++-4.9" CC="gcc-4.9"
-#  - $CC --version
 
 install:
   # Install Ansible.
-#  - CXX="g++-4.9" CC="gcc-4.9"
   - pip install ansible 1>/dev/null
 
   # Add ansible.cfg to pick up roles path.
