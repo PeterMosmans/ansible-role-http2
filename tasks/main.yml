@@ -11,7 +11,7 @@
     - autoconf
     - automake
     - binutils
-    - g++
+#    - g++
     - libcunit1-dev
     - libev-dev
     - libevent-dev
