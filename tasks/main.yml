@@ -29,11 +29,11 @@
 - name: Add git group
   group: name=git state=present
 
-- name: test gcc compiler version
-  shell: gcc --version
-  register: gcc_version
+- name: test compiler version
+  shell: g++ --version
+  register: gpp_version
 
-- debug: var=gcc_version  
+- debug: var=gpp_version  
 
 - name: Create git location
   file:
