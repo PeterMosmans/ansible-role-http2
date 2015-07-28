@@ -39,6 +39,17 @@ The following libraries will be installed:
 
 Note that the role installs all libraries and tools each time, fresh from their github repositories. Currently it doesn't check the status of previously installed libraries and tools. It also doesn't remove the packages necessary for compiling all the tools.
 
+The testing process can take quite a while - please be patient.
+
+
+Roadmap
+------
+* Testing of the binaries will be optional
+
+* Tools will be optional
+
+* Source location can be set
+
 
 Requirements
 ------------
