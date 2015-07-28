@@ -80,9 +80,13 @@
 - name: Update cache
   command: ldconfig -v
   
-- name: Build and install nghttp library
-  shell: cd /var/git/nghttp2 && autoreconf -i && automake && autoconf && ./configure && make && make install
+- name: Configure nghttp library
+  shell: cd /var/git/nghttp2 && autoreconf -i && automake && autoconf && ./configure
+  ignore_errors: yes
 
+- name: Build and install nghttp library
+  shell: cd /var/git/nghttp2 && make 1>/dev/null && make install
+   
 - name: Update cache
   command: ldconfig -v
 
